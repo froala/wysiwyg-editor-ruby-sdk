@@ -29,11 +29,14 @@ module FroalaEditor
       file = params[options[:fieldname]]
 
       if file
+
         # Validates the video extension and mime type.
         validation = VideoValidation.check(file, options)
+
         # Uses the Utlis name function to generate a random name for the video.
         file_name = Utils.name(file)
         path = Rails.root.join(upload_path, file_name)
+
         # Saves the video on the server and returns the path.
         serve_url = save(file, path)
 

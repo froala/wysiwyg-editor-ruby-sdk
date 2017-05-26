@@ -30,13 +30,17 @@ module FroalaEditor
 
 
       if file
+
         # Validates the image extension and mime type.
         validation = ImageValidation.check(file, options)
+
         # Uses the Utlis name function to generate a random name for the image.
         file_name = Utils.name(file)
         path = Rails.root.join(upload_path, file_name)
+
         # Saves the image on the server and returns the path.
         serve_url = save(file, path)
+
         # Check the option param, if resize is not needed it will use default options constant.
         if !options[:resize].nil?
           resize = image_resize(options, path)

@@ -29,9 +29,8 @@ module FroalaEditor
       {
           expiration: 10.hours.from_now.utc.iso8601,
           conditions: [
-              ["starts-with", "$key", 'temp_files/'],       # Start key/folder
+              ["starts-with", "$key", options[:keyStart]],       # Start key/folder
               ["starts-with", "$x-requested-with", "xhr"],  # Request type
-              ["content-length-range", 0, 20.megabytes],    # Max content lenght
               ["starts-with", "$content-type", ""],         # Content type
               {bucket: options[:bucket]},                   # Bucket name
               {acl: options[:acl]},                         # ACL property
@@ -47,7 +46,7 @@ module FroalaEditor
       options[:region] = 'us-east-1' if options[:region].nil? ||  options[:region] == 's3'
       {
           :signature => self.signature(options), # Defined signature
-          :policy => self.policy(options),       # Definded policy
+          :policy => self.policy(options),       # Defined policy
           :bucket => options[:bucket],           # Upload bucket
           :acl => options[:acl],                 # ACL property 'public-read'
           :keyStart => options[:keyStart],       # Start key/folder
