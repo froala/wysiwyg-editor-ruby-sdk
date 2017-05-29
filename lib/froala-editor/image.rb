@@ -2,7 +2,7 @@ module FroalaEditor
   # Image functionality.
   class Image < File
 
-    # Default options that are used if no options are passed to the upload function
+    # Default options that are used if no options are passed to the upload function.
     @@default_options = {
         fieldname: 'file',
         validation: {
@@ -12,9 +12,8 @@ module FroalaEditor
         resize: nil
     }
 
-    def self.upload (params, upload_path = "public/uploads/images", options = nil)
-      super
-    end
+    # Default upload path.
+    @@default_upload_path = "public/uploads/images"
 
     # Loads the images from a specific path
     # Params:

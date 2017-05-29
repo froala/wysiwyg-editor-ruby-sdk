@@ -13,14 +13,7 @@ module FroalaEditor
         resize: nil
     }
 
-    # Uploads a video to the server.
-    # Params:
-    # +params+:: File upload parameter mostly is "file".
-    # +upload_path+:: Server upload path, a storage path where the video will be stored.
-    # +options+:: Hash object that contains configuration parameters for uploading a video.
-    # Returns json object
-    def self.upload(params, upload_path = "public/uploads/videos", options = nil)
-      super
-    end
+    # Default upload path.
+    @@default_upload_path = "public/uploads/videos"
   end
 end

@@ -1,5 +1,7 @@
 module FroalaEditor
 
+  require 'fileutils'
+
   # File functionality.
   class File
 
@@ -13,13 +15,16 @@ module FroalaEditor
         resize: nil
     }
 
+    # Default upload path.
+    @@default_upload_path = "public/uploads/files"
+
     # Uploads a file to the server.
     # Params:
     # +params+:: File upload parameter mostly is "file".
     # +upload_path+:: Server upload path, a storage path where the file will be stored.
     # +options+:: Hash object that contains configuration parameters for uploading a file.
     # Returns json object
-    def self.upload(params, upload_path = "public/uploads/files", options = nil)
+    def self.upload(params, upload_path = @@default_upload_path, options = nil)
 
       # Merge options.
       options = (options || @@default_options).merge(options)
@@ -51,6 +56,13 @@ module FroalaEditor
     # +file+:: The uploaded file that will be saved on the server.
     # +path+:: The path where the file will be saved.
     def self.save (file, path)
+
+      # Create directory if it doesn't exist.
+      dirname = ::File.dirname(path)
+      unless ::File.directory?(dirname)
+        ::FileUtils.mkdir_p(dirname)
+      end
+
       if ::File.open(path, "wb") {|f| f.write(file.read)}
 
         # Returns a public accessible server path.

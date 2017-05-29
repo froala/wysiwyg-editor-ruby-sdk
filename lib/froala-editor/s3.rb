@@ -44,6 +44,7 @@ module FroalaEditor
     # +options+:: Configuration params to generate the AWS response.
     def self.data_hash (options = nil)
       options[:region] = 'us-east-1' if options[:region].nil? ||  options[:region] == 's3'
+
       {
           :signature => self.signature(options), # Defined signature
           :policy => self.policy(options),       # Defined policy
