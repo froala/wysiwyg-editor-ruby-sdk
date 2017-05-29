@@ -15,7 +15,5 @@ module FroalaEditor
     def self.get_file_name(path)
       return ::File.basename(path)
     end
-
-
   end
 end

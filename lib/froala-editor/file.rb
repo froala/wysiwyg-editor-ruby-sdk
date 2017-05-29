@@ -21,17 +21,15 @@ module FroalaEditor
     # Returns json object
     def self.upload(params, upload_path = "public/uploads/files", options = nil)
 
-      if options == nil
-        options = @@default_options
-      else
-        options = @@default_options.merge(options)
-      end
+      # Merge options.
+      options = (options || @@default_options).merge(options)
+
       file = params[options[:fieldname]]
 
       if file
 
         # Validates the file extension and mime type.
-        validation = FileValidation.check(file, options)
+        validation = Validation.check(file, options)
 
         # Uses the Utlis name function to generate a random name for the file.
         file_name = Utils.name(file)
@@ -39,6 +37,8 @@ module FroalaEditor
 
         # Saves the file on the server and returns the path.
         serve_url = save(file, path)
+
+        resize(options, path) if !options[:resize].nil?
 
         return {:link => serve_url}.to_json
       else
@@ -73,6 +73,17 @@ module FroalaEditor
       else
         return false
       end
+    end
+
+    # Resizes an image based on the options provided.
+    # The function resizes the original file,
+    # Params:
+    # +options+:: The options that contain the resize hash
+    # +path+:: The path where the image is stored
+    def self.resize (options, path)
+      image = MiniMagick::Image.new(path)
+      image.path
+      image.resize("#{options[:resize][:height]}x#{options[:resize][:width]}")
     end
   end
 end
