@@ -39,8 +39,8 @@ and run `bundle install`.
    end
    ```
 
-   ​
-
+## Example App
+https://github.com/froala/editor-ruby-sdk-example 
 
 ## Dependencies
 
