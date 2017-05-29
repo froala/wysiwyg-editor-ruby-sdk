@@ -3,7 +3,6 @@
 Easing the [Froala WYSIWYG HTML Editor](https://github.com/froala/wysiwyg-editor) server side integration in PHP projects.
 
 
-
 ## Setup Instructions
 
 Add this to your Gemfile:
@@ -15,7 +14,6 @@ gem "froala-editor-sdk"
 and run `bundle install`.
 
 
-
 ## Dependencies
 
 The following Ruby gems are used:
@@ -23,20 +21,18 @@ The following Ruby gems are used:
 - mime-types
 - mini_magick
 - wysiwyg-rails
-
+  
 
 
 ## Documentation
 
 - [Official documentation](https://www.froala.com/wysiwyg-editor/docs/sdks/ruby)
 
-  ​
 
 ## Help
 
 - Found a bug or have some suggestions? Just submit an issue.
 - Having trouble with your integration? [Contact Froala Support team](http://froala.dev/wysiwyg-editor/contact).
-
 
 
 ## License
