@@ -6,7 +6,7 @@ module FroalaEditorSDK
   class File
 
     # Default options that are used if no options are passed to the upload function
-    @@default_options = {
+    @default_options = {
         fieldname: 'file',
         validation: {
             allowedExts: [".txt", ".pdf", ".doc", ".json", ".html"],
@@ -16,7 +16,7 @@ module FroalaEditorSDK
     }
 
     # Default upload path.
-    @@default_upload_path = "public/uploads/files"
+    @default_upload_path = "public/uploads/files"
 
     # Uploads a file to the server.
     # Params:
@@ -24,10 +24,10 @@ module FroalaEditorSDK
     # +upload_path+:: Server upload path, a storage path where the file will be stored.
     # +options+:: Hash object that contains configuration parameters for uploading a file.
     # Returns json object
-    def self.upload(params, upload_path = @@default_upload_path, options = {})
+    def self.upload(params, upload_path = @default_upload_path, options = {})
 
       # Merge options.
-      options = @@default_options.merge(options)
+      options = @default_options.merge(options)
 
       file = params[options[:fieldname]]
 
@@ -96,6 +96,14 @@ module FroalaEditorSDK
       image = MiniMagick::Image.new(path)
       image.path
       image.resize("#{options[:resize][:height]}x#{options[:resize][:width]}")
+    end
+
+    class << self
+      attr_reader :var
+    end
+
+    def var
+      self.class.var
     end
   end
 end

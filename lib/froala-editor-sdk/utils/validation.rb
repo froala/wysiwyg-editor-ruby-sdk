@@ -22,7 +22,12 @@ module FroalaEditorSDK
 
       mime = file.content_type
       ext = ::File.extname(file.original_filename)
-      if ext(ext, options) && mime(mime, options)
+
+      # Check if there is custom validation.
+      if options[:validation].class != Proc
+        ext(ext, options) && mime(mime, options)
+      else
+        options[:validation].call(file.path, mime)
       end
     end
 

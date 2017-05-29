@@ -4,7 +4,7 @@ module FroalaEditorSDK
   class Video < File
 
     # Default options that are used if no options are passed to the upload function
-    @@default_options = {
+    @default_options = {
         fieldname: 'file',
         validation: {
             allowedExts: [".mp4", ".webm", ".ogg"],
@@ -14,6 +14,6 @@ module FroalaEditorSDK
     }
 
     # Default upload path.
-    @@default_upload_path = "public/uploads/videos"
+    @default_upload_path = "public/uploads/videos"
   end
 end
