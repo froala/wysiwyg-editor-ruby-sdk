@@ -28,7 +28,7 @@ The following Ruby gems are used:
 
 ## Documentation
 
-- [Official documentation](https://www.froala.com/wysiwyg-editor/docs/sdks/php)
+- [Official documentation](https://www.froala.com/wysiwyg-editor/docs/sdks/ruby)
 
   ​
 
