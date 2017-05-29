@@ -24,10 +24,10 @@ module FroalaEditorSDK
     # +upload_path+:: Server upload path, a storage path where the file will be stored.
     # +options+:: Hash object that contains configuration parameters for uploading a file.
     # Returns json object
-    def self.upload(params, upload_path = @@default_upload_path, options = nil)
+    def self.upload(params, upload_path = @@default_upload_path, options = {})
 
       # Merge options.
-      options = (options || @@default_options).merge(options)
+      options = @@default_options.merge(options)
 
       file = params[options[:fieldname]]
 
