@@ -1,4 +1,4 @@
-module FroalaEditor
+module FroalaEditorSDK
 
   # Image Validation class.
   # Checks if image is matching the allowed extensions and mime types.

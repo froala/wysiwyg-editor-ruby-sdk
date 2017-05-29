@@ -1,4 +1,4 @@
-require File.expand_path('../lib/froala-editor/version', __FILE__)
+require File.expand_path('../lib/froala-editor-sdk/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = "Froala Labs"
@@ -8,9 +8,9 @@ Gem::Specification.new do |gem|
   gem.licenses      = "MIT"
 
   gem.files         = Dir["{lib}/**/*"]
-  gem.name          = "froala-editor"
+  gem.name          = "froala-editor-sdk"
   gem.require_paths = ['lib']
-  gem.version       = FroalaEditor::Version::String
+  gem.version       = FroalaEditorSDK::Version::String
 
   gem.add_dependency 'mime-types', '~> 3.1'
   gem.add_dependency 'wysiwyg-rails', '~> 2.6.0'

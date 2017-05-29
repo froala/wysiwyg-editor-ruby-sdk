@@ -1,4 +1,4 @@
-module FroalaEditor
+module FroalaEditorSDK
 
   # Uploads files to S3/AWS
   class S3

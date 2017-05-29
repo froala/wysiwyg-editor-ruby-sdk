@@ -1,4 +1,4 @@
-module FroalaEditor
+module FroalaEditorSDK
   # Image functionality.
   class Image < File
 

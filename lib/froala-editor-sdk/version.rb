@@ -1,4 +1,4 @@
-module FroalaEditor
+module FroalaEditorSDK
   module Version
     Major = 1
     Minor = 0

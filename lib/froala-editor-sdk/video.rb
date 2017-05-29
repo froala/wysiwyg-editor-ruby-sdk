@@ -1,4 +1,4 @@
-module FroalaEditor
+module FroalaEditorSDK
 
   # Video functionality.
   class Video < File

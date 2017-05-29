@@ -1,4 +1,4 @@
-module FroalaEditor
+module FroalaEditorSDK
 
   require 'fileutils'
 
