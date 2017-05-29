@@ -14,6 +14,34 @@ gem "froala-editor-sdk"
 and run `bundle install`.
 
 
+
+## Quick start - Image Upload
+
+1. Define upload route in `routes.rb` file.
+
+   ```ruby
+   post '/upload_image' => 'upload#upload_image', :as => :upload_image
+   ```
+
+2. Tell editor to upload to the specified route in your JS.
+
+   ```javascript
+   $('selector').froalaEditor({
+     imageUploadURL: '/upload_image'
+   });
+   ```
+
+3. In your controller define an action to store the uploaded file.
+
+   ```ruby
+   def upload_image
+     render :json => FroalaEditorSDK::Image.upload(params, "public/uploads/images/")
+   end
+   ```
+
+   ​
+
+
 ## Dependencies
 
 The following Ruby gems are used:
@@ -21,7 +49,6 @@ The following Ruby gems are used:
 - mime-types
 - mini_magick
 - wysiwyg-rails
-  
 
 
 ## Documentation
