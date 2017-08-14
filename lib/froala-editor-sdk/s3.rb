@@ -46,13 +46,15 @@ module FroalaEditorSDK
       options[:region] = 'us-east-1' if options[:region].nil? ||  options[:region] == 's3'
 
       {
+        :bucket => options[:bucket],           # Upload bucket
+        :region =>  options[:region] != 'us-east-1' ? "s3-#{options[:region]}" : 's3', # Upload region
+        :keyStart => options[:keyStart],       # Start key/folder
+        :params => {
           :signature => self.signature(options), # Defined signature
+          :AWSAccessKeyId => options[:accessKey],     # Your Access key
           :policy => self.policy(options),       # Defined policy
-          :bucket => options[:bucket],           # Upload bucket
-          :acl => options[:acl],                 # ACL property 'public-read'
-          :keyStart => options[:keyStart],       # Start key/folder
-          :accessKey => options[:accessKey],     # Your Access key
-          :region =>  options[:region] != 'us-east-1' ? "s3-#{options[:region]}" : 's3' # Upload region
+          :acl => options[:acl]                 # ACL property 'public-read'
+        }
       }
     end
   end
