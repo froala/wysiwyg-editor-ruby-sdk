@@ -95,7 +95,7 @@ module FroalaEditorSDK
     def self.resize (options, path)
       image = MiniMagick::Image.new(path)
       image.path
-      image.resize("#{options[:resize][:height]}x#{options[:resize][:width]}")
+      image.resize("#{options[:resize][:width]}x#{options[:resize][:height]}#{options[:resize][:operator]}")
     end
 
     class << self
