@@ -36,12 +36,8 @@ module FroalaEditorSDK
         # Validates the file extension and mime type.
         validation = Validation.check(file, options)
 
-        # Uses the Utlis name function to generate a random name for the file.
-        file_name = Utils.name(file)
-        path = Rails.root.join(upload_path, file_name)
-
         # Saves the file on the server and returns the path.
-        serve_url = save(file, path)
+        serve_url = save(file, upload_path)
 
         resize(options, path) if !options[:resize].nil?
 
@@ -55,7 +51,11 @@ module FroalaEditorSDK
     # Params:
     # +file+:: The uploaded file that will be saved on the server.
     # +path+:: The path where the file will be saved.
-    def self.save (file, path)
+    def self.save (file, upload_path)
+
+      # Uses the Utlis name function to generate a random name for the file.
+      file_name = Utils.name(file)
+      path = Rails.root.join(upload_path, file_name)
 
       # Create directory if it doesn't exist.
       dirname = ::File.dirname(path)
@@ -64,9 +64,8 @@ module FroalaEditorSDK
       end
 
       if ::File.open(path, "wb") {|f| f.write(file.read)}
-
         # Returns a public accessible server path.
-        return "#{"/uploads/"}#{Utils.get_file_name(path)}"
+        return "#{upload_path.gsub('public', '')}/#{Utils.get_file_name(path)}"
       else
         return "error"
       end
