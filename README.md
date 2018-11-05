@@ -1,6 +1,6 @@
 # Froala WYSIWYG Editor Ruby SDK
 
-Easing the [Froala WYSIWYG HTML Editor](https://github.com/froala/wysiwyg-editor) server side integration in PHP projects.
+Easing the [Froala WYSIWYG HTML Editor](https://github.com/froala/wysiwyg-editor) server side integration in Ruby projects.
 
 
 ## Setup Instructions
