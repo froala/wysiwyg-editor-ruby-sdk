@@ -15,17 +15,20 @@ module FroalaEditorSDK
     # Default upload path.
     @default_upload_path = "public/uploads/images"
 
+    # Default image access path
+    @default_image_access_path = "/uploads/"
+
     # Loads the images from a specific path
     # Params:
     # +path+:: The server path where the images are saved
     # Returns Json object
-    def self.load_images(path)
+    def self.load_images(path, image_access_path = @default_image_access_path)
 
       images = Dir["#{path}*"]
       all_images = []
 
       images.each do |img|
-        all_images.push({url: "#{"/uploads/"}#{Utils.get_file_name(img)}"})
+        all_images.push({url: "#{image_access_path}#{Utils.get_file_name(img)}"})
       end
 
       return all_images.to_json
