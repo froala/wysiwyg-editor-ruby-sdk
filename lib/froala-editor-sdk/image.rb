@@ -10,7 +10,7 @@ module FroalaEditorSDK
             allowedMimeTypes: [ "image/gif", "image/jpeg", "image/pjpeg", "image/x-png", "image/png", "image/svg+xml" ]
         },
         resize: nil,
-        file_access_path: "/uploads/"
+        file_access_path: '/uploads/'
     }
 
     # Default upload path.
@@ -29,7 +29,7 @@ module FroalaEditorSDK
       all_images = []
 
       images.each do |img|
-        all_images.push({url: "#{options[:file_access_path}#{Utils.get_file_name(img)}"})
+        all_images.push({url: "#{options[:file_access_path]}#{Utils.get_file_name(img)}"})
       end
 
       return all_images.to_json

@@ -13,7 +13,7 @@ module FroalaEditorSDK
             allowedMimeTypes: [ "text/plain", "application/msword", "application/x-pdf", "application/pdf", "application/json","text/html" ]
         },
         resize: nil,
-        file_access_path: "/uploads/"
+        file_access_path: '/uploads/'
     }
 
     # Default upload path.

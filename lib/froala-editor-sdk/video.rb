@@ -11,7 +11,7 @@ module FroalaEditorSDK
             allowedMimeTypes: [ "video/mp4", "video/webm", "video/ogg" ]
         },
         resize: nil,
-        file_access_path: "/uploads/"
+        file_access_path: '/uploads/'
     }
 
     # Default upload path.
