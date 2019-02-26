@@ -78,12 +78,9 @@ module FroalaEditorSDK
     # +file+:: The file that will be deleted from the server.
     # +path+:: The server path where the file resides.
     # Returns true or false.
-    def self.delete(file = params[:file], options = {})
+    def self.delete(file = params[:file], path)
 
-      # Merge options.
-      options = @default_options.merge(options)
-
-      file_path = Rails.root.join(options[:file_access_path], ::File.basename(file))
+      file_path = Rails.root.join(path, ::File.basename(file))
       begin
         if ::File.delete(file_path)
           return true
