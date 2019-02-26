@@ -80,9 +80,13 @@ module FroalaEditorSDK
     def self.delete(file = params[:file], path)
 
       file_path = Rails.root.join(path, ::File.basename(file))
-      if ::File.delete(file_path)
-        return true
-      else
+      begin
+        if ::File.delete(file_path)
+          return true
+        else
+          return false
+        end
+      rescue => exception
         return false
       end
     end
