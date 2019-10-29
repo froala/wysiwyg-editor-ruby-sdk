@@ -13,6 +13,6 @@ Gem::Specification.new do |gem|
   gem.version       = FroalaEditorSDK::Version::String
 
   gem.add_dependency 'mime-types', '~> 3.1'
-  gem.add_dependency 'wysiwyg-rails', '~> 2.9'
+  gem.add_dependency 'wysiwyg-rails', '>= 2.9', '< 4.0'
   gem.add_dependency 'mini_magick', '~> 4.5'
 end
