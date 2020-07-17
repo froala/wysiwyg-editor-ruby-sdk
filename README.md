@@ -50,7 +50,8 @@ The following Ruby gems are used:
 - mini_magick
 - wysiwyg-rails
 
-
+ #### Note
+ > Third-party plugins are not supported
 ## Documentation
 
 - [Official documentation](https://www.froala.com/wysiwyg-editor/docs/sdks/ruby)
