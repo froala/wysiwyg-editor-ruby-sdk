@@ -9,5 +9,6 @@
         "stg": "1",  
         "comment-3": "froala-editor-sdk - set the branchname of ruby sdk git repo",
         "ruby_sdk_name": "wysiwyg-editor-ruby-sdk",
-        "ruby_sdk_repo": "https://github.com/froala/wysiwyg-editor-ruby-sdk.git"
+        "ruby_sdk_repo": "https://github.com/froala/wysiwyg-editor-ruby-sdk.git",
+        "ruby_sdk_branch": "QE-2304"
 }
