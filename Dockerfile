@@ -1,6 +1,6 @@
 FROM ruby:2.7.2
 
-LABEL maintainer="rizwan@celestialsys.com"
+LABEL maintainer="ganga@celestialsys.com"
 ARG PackageName
 ARG PackageVersion
 ARG NexusUser
