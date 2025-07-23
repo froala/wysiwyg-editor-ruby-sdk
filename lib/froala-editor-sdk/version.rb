@@ -1,8 +1,8 @@
 module FroalaEditorSDK
   module Version
     Major = 4
-    Minor = 5
-    Tiny = 2
+    Minor = 6
+    Tiny = 0
 
     String = "#{Major}.#{Minor}.#{Tiny}"
   end
