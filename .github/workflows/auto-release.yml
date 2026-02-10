@@ -1,0 +1,81 @@
+name: Auto Release – Ruby SDK
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      # --------------------------------------------
+      # Verify release intent
+      # --------------------------------------------
+      - name: Check release intent
+        id: check
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            const text = `${context.payload.pull_request.title}
+                          ${context.payload.pull_request.body}`;
+            core.setOutput(
+              'release',
+              /release:\s*yes/i.test(text) ? 'true' : 'false'
+            );
+
+      - name: Exit if not release PR
+        if: steps.check.outputs.release == 'false'
+        run: exit 0
+
+      # --------------------------------------------
+      # Checkout merged code
+      # --------------------------------------------
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+          fetch-depth: 0
+
+      # --------------------------------------------
+      # Setup Ruby
+      # --------------------------------------------
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      # --------------------------------------------
+      # Read version
+      # --------------------------------------------
+      - name: Read version
+        run: |
+          VERSION=$(ruby -e "
+            spec = Gem::Specification.load('wysiwyg-editor-ruby-sdk.gemspec')
+            puts spec.version
+          ")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+
+      # --------------------------------------------
+      # Build gem
+      # --------------------------------------------
+      - name: Build gem
+        run: gem build wysiwyg-editor-ruby-sdk.gemspec
+
+
+      # --------------------------------------------
+      # Create GitHub Release
+      # --------------------------------------------
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
+        run: |
+          gh release create "v${VERSION}" \
+            --title "Ruby SDK v${VERSION}" \
+            --notes "${{ github.event.pull_request.body }}" \
+            *.gem
