@@ -1,0 +1,187 @@
+name: Sync Version – Ruby SDK
+
+on:
+  repository_dispatch:
+    types: [version_update]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      # --------------------------------------------
+      # Checkout repository
+      # --------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+          fetch-depth: 0
+
+      # --------------------------------------------
+      # Load & validate incoming version
+      # --------------------------------------------
+      - name: Load & validate version
+        shell: bash
+        run: |
+          set -e
+
+          VERSION="${{ github.event.client_payload.version }}"
+          VERSION="${VERSION//,/\.}"
+
+          if [[ -z "$VERSION" ]]; then
+            echo "❌ Version is missing in repository_dispatch payload"
+            exit 1
+          fi
+
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "❌ Invalid version format: $VERSION"
+            exit 1
+          fi
+
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "✅ Incoming version validated: $VERSION"
+
+      # --------------------------------------------
+      # Compare current version vs incoming version
+      # --------------------------------------------
+      - name: Compare current version
+        shell: bash
+        run: |
+          set -e
+
+          FILE="lib/froala-editor-sdk/version.rb"
+
+          if [[ ! -f "$FILE" ]]; then
+            echo "❌ version.rb not found at $FILE"
+            exit 1
+          fi
+
+          CURRENT_VERSION=$(ruby -e "
+            load '$FILE'
+            puts [
+              FroalaEditorSDK::Version::Major,
+              FroalaEditorSDK::Version::Minor,
+              FroalaEditorSDK::Version::Tiny
+            ].join('.')
+          ")
+
+          echo "📦 Current version : $CURRENT_VERSION"
+          echo "🚀 Incoming version: $VERSION"
+
+          if [[ "$CURRENT_VERSION" == "${VERSION%%-*}" ]]; then
+            echo "⛔ Versions are identical. Skipping PR creation."
+            exit 0
+          fi
+
+          echo "✅ Versions differ. Proceeding with sync."
+
+      # --------------------------------------------
+      # Prepare release branch
+      # --------------------------------------------
+      - name: Prepare release branch
+        shell: bash
+        run: |
+          set -e
+
+          BRANCH="release-v${VERSION}"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+          git fetch origin
+
+          if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
+            echo "🔁 Using existing branch: $BRANCH"
+            git checkout "$BRANCH"
+            git pull origin "$BRANCH"
+          else
+            echo "🌱 Creating new branch: $BRANCH"
+            git checkout -b "$BRANCH"
+          fi
+
+      # --------------------------------------------
+      # Update version.rb
+      # --------------------------------------------
+      - name: Update version.rb
+        shell: bash
+        run: |
+          set -e
+
+          FILE="lib/froala-editor-sdk/version.rb"
+
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3 | cut -d- -f1)
+
+          sed -i "s/Major = .*/Major = ${MAJOR}/" "$FILE"
+          sed -i "s/Minor = .*/Minor = ${MINOR}/" "$FILE"
+          sed -i "s/Tiny  = .*/Tiny  = ${PATCH}/" "$FILE"
+
+          echo "✅ Updated version.rb → ${MAJOR}.${MINOR}.${PATCH}"
+
+      # --------------------------------------------
+      # Update gemspec version
+      # --------------------------------------------
+      - name: Update gemspec version
+        shell: bash
+        run: |
+          set -e
+
+          GEMSPEC="wysiwyg-editor-ruby-sdk.gemspec"
+
+          if [[ ! -f "$GEMSPEC" ]]; then
+            echo " Gemspec not found at $GEMSPEC"
+            exit 1
+          fi
+
+          sed -i -E \
+            "s/spec.version\s*=.*/spec.version = '${VERSION}'/" \
+            "$GEMSPEC"
+
+          echo "✅ Updated gemspec version → $VERSION"
+
+      # --------------------------------------------
+      # Commit & push changes
+      # --------------------------------------------
+      - name: Commit & push
+        shell: bash
+        run: |
+          set -e
+
+          git config user.name "froala-travis-bot"
+          git config user.email "froala_git_travis_bot@idera.com"
+
+          git add \
+            lib/froala-editor-sdk/version.rb \
+            wysiwyg-editor-ruby-sdk.gemspec
+
+          if git diff --cached --quiet; then
+            echo "ℹ️ No changes to commit"
+          else
+            git commit -m "chore: release v${VERSION} (Ruby SDK)"
+            git push origin "$BRANCH"
+            echo "🚀 Changes pushed to $BRANCH"
+          fi
+
+      # --------------------------------------------
+      # Create Pull Request (idempotent)
+      # --------------------------------------------
+      - name: Create Pull Request
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
+        run: |
+          set -e
+
+          if gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
+            echo "✅ Pull request already exists for $BRANCH"
+          else
+            gh pr create \
+              --base master \
+              --head "$BRANCH" \
+              --title "Release v${VERSION} (Ruby SDK)" \
+              --body "release: yes"
+          fi
