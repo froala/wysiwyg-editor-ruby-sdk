@@ -70,8 +70,7 @@ jobs:
           gh release create "v${VERSION}" \
             --title "Ruby SDK v${VERSION}" \
             --notes "${{ github.event.pull_request.body }}" \
-            *.gem
-      
+         
       # --------------------------------------------
       # Build gem
       # --------------------------------------------
