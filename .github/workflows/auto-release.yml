@@ -1,81 +1,76 @@
-name: Auto Release – Ruby SDK
+name: Auto Release – Ruby SDK (Child-B)
 
 on:
-  pull_request_target:
+  pull_request:
     types: [closed]
-    branches: [master]
+    branches:
+      - master
 
 permissions:
   contents: write
 
 jobs:
-  release:
+  check:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-
+    outputs:
+      release: ${{ steps.check.outputs.release }}
     steps:
-      # --------------------------------------------
-      # Verify release intent
-      # --------------------------------------------
-      - name: Check release intent
+      - name: Check merge commit for release intent
         id: check
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.PAT }}
           script: |
-            const text = `${context.payload.pull_request.title}
-                          ${context.payload.pull_request.body}`;
-            core.setOutput(
-              'release',
-              /release:\s*yes/i.test(text) ? 'true' : 'false'
-            );
+            const { data: commit } = await github.rest.git.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.payload.pull_request.merge_commit_sha
+            });
+            const msg = commit.message || '';
+            const isRelease = /release:\s*yes/i.test(msg);
+            core.info(`Merge commit message:\n${msg}`);
+            core.info(`Release intent: ${isRelease}`);
+            core.setOutput('release', isRelease ? 'true' : 'false');
 
-      - name: Exit if not release PR
-        if: steps.check.outputs.release == 'false'
-        run: exit 0
-
-      # --------------------------------------------
-      # Checkout merged code
-      # --------------------------------------------
-      - uses: actions/checkout@v4
+  release:
+    needs: check
+    if: needs.check.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    environment: PAT
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
-          fetch-depth: 0
 
-      # --------------------------------------------
-      # Setup Ruby
-      # --------------------------------------------
-      - uses: ruby/setup-ruby@v1
+      - name: Read version from gemspec
+        run: |
+          VERSION=$(ruby -e "spec = Gem::Specification.load('wysiwyg-editor-ruby-sdk.gemspec'); puts spec.version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
 
-      # --------------------------------------------
-      # Read version
-      # --------------------------------------------
-      - name: Read version
-        run: |
-          VERSION=$(ruby -e "
-            spec = Gem::Specification.load('wysiwyg-editor-ruby-sdk.gemspec')
-            puts spec.version
-          ")
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      # --------------------------------------------
-      # Create GitHub Release
-      # --------------------------------------------
-      - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}
-        run: |
-          gh release create "v${VERSION}" \
-            --title "Ruby SDK v${VERSION}" \
-            --notes "${{ github.event.pull_request.body }}" \
-         
-      # --------------------------------------------
-      # Build gem
-      # --------------------------------------------
       - name: Build gem
         run: gem build wysiwyg-editor-ruby-sdk.gemspec
 
+      - name: Publish to RubyGems
+        env:
+          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+        run: |
+          mkdir -p ~/.gem
+          echo ":rubygems_api_key: $RUBYGEMS_API_KEY" > ~/.gem/credentials
+          chmod 600 ~/.gem/credentials
+          gem push froala-editor-sdk-${VERSION}.gem
 
-      
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        run: |
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            echo "Release v${VERSION} already exists. Skipping."
+            exit 0
+          fi
+          gh release create "v${VERSION}" --title "Release ${VERSION}" --notes "Release v${VERSION}" --latest
