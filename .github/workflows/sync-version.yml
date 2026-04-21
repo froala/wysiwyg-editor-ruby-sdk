@@ -1,4 +1,4 @@
-name: Sync Version – Ruby SDK (Child-B)
+name: Sync Version – Ruby SDK
  
 on:
   repository_dispatch:
@@ -71,8 +71,8 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+         git config user.name "froala-travis-bot"
+         git config user.email "froala_git_travis_bot@idera.com"
  
           git add lib/froala-editor-sdk/version.rb wysiwyg-editor-ruby-sdk.gemspec release_notes.txt
  
