@@ -1,4 +1,4 @@
-name: Auto Release – Ruby SDK (Child-B)
+name: Auto Release – Ruby SDK
 
 on:
   pull_request:
@@ -45,25 +45,12 @@ jobs:
 
       - name: Read version from gemspec
         run: |
-          VERSION=$(ruby -e "spec = Gem::Specification.load('wysiwyg-editor-ruby-sdk.gemspec'); puts spec.version")
+          VERSION=$(ruby -e "
+            spec = Gem::Specification.load('wysiwyg-editor-ruby-sdk.gemspec')
+            puts spec.version
+          ")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1'
-
-      - name: Build gem
-        run: gem build wysiwyg-editor-ruby-sdk.gemspec
-
-      - name: Publish to RubyGems
-        env:
-          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
-        run: |
-          mkdir -p ~/.gem
-          echo ":rubygems_api_key: $RUBYGEMS_API_KEY" > ~/.gem/credentials
-          chmod 600 ~/.gem/credentials
-          gem push froala-editor-sdk-${VERSION}.gem
+          echo "Releasing version: $VERSION"
 
       - name: Create GitHub Release
         env:
@@ -73,4 +60,7 @@ jobs:
             echo "Release v${VERSION} already exists. Skipping."
             exit 0
           fi
-          gh release create "v${VERSION}" --title "Release ${VERSION}" --notes "Release v${VERSION}" --latest
+          gh release create "v${VERSION}" \
+            --title "Release ${VERSION}" \
+            --notes "Release v${VERSION}" \
+            --latest
