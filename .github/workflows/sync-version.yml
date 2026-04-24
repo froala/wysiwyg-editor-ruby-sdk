@@ -1,51 +1,47 @@
 name: Sync Version – Ruby SDK
- 
+
 on:
   repository_dispatch:
     types: [version_update]
- 
+
 permissions:
   contents: write
   pull-requests: write
- 
+
 jobs:
   sync:
     runs-on: ubuntu-latest
     environment: PAT
- 
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
- 
 
       - name: Load & validate version
         run: |
           VERSION="${{ github.event.client_payload.version }}"
           VERSION="${VERSION//,/\.}"
- 
+
           if [ -z "$VERSION" ]; then
             echo "Version missing in dispatch payload"
             exit 1
           fi
- 
+
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
             echo "Invalid version format: $VERSION"
             exit 1
           fi
- 
+
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Dispatching version $VERSION"
-
 
       - name: Prepare release branch
         run: |
           BRANCH="release-v${VERSION}"
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
-
           git fetch origin
-
           if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
             git checkout "$BRANCH"
             git pull origin "$BRANCH"
@@ -57,28 +53,25 @@ jobs:
         run: |
           FILE="lib/froala-editor-sdk/version.rb"
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
- 
+
           sed -i "s/Major = .*/Major = ${MAJOR}/" $FILE
           sed -i "s/Minor = .*/Minor = ${MINOR}/" $FILE
           sed -i "s/Tiny  = .*/Tiny  = ${PATCH}/" $FILE
- 
 
       - name: Update gemspec version
         run: |
           GEMSPEC="wysiwyg-editor-ruby-sdk.gemspec"
           sed -i "s/spec.version *= *.*/spec.version = '${VERSION}'/" $GEMSPEC
- 
 
       - name: Commit changes
         run: |
-         git config user.name "froala-travis-bot"
-         git config user.email "froala_git_travis_bot@idera.com"
- 
-          git add lib/froala-editor-sdk/version.rb wysiwyg-editor-ruby-sdk.gemspec release_notes.txt
- 
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add lib/froala-editor-sdk/version.rb wysiwyg-editor-ruby-sdk.gemspec
+
           git commit -m "chore: release v${VERSION} (Ruby SDK)" || echo "Nothing to commit"
           git push origin "$BRANCH"
- 
 
       - name: Create Pull Request
         env:
@@ -86,14 +79,11 @@ jobs:
           RELEASE_NOTES: ${{ github.event.client_payload.release_notes }}
         run: |
           git fetch origin master
-
           if git diff --quiet origin/master..."$BRANCH"; then
             echo "No commits between $BRANCH and master. Skipping PR creation."
             exit 0
           fi
-
-          PR_BODY=$(printf "## Release Notes (from primary repo)\n\n%s\n\n---\n_To publish this release, add \`release: yes\` to the merge commit message when merging._\n" "$RELEASE_NOTES")
-
+          PR_BODY=$(printf "## Release Notes (from primary repo)\n\n%s\n" "$RELEASE_NOTES")
           gh pr create \
             --base master \
             --head "$BRANCH" \
