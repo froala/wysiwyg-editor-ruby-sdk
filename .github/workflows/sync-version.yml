@@ -56,12 +56,13 @@ jobs:
 
           sed -i "s/Major = .*/Major = ${MAJOR}/" $FILE
           sed -i "s/Minor = .*/Minor = ${MINOR}/" $FILE
-          sed -i "s/Tiny  = .*/Tiny  = ${PATCH}/" $FILE
+          sed -i "s/Tiny = .*/Tiny = ${PATCH}/" $FILE
 
       - name: Update gemspec version
         run: |
           GEMSPEC="wysiwyg-editor-ruby-sdk.gemspec"
-          sed -i "s/spec.version *= *.*/spec.version = '${VERSION}'/" $GEMSPEC
+          sed -i -E "s/(gem\.add_dependency\s+'wysiwyg-rails',\s+'~>\s*)[0-9]+\.[0-9]+\.[0-9]+(')/\1${VERSION}\2/" "$GEMSPEC"
+          grep -q "wysiwyg-rails', '~> ${VERSION}'" "$GEMSPEC" || { echo "wysiwyg-rails dependency update failed"; exit 1; }
 
       - name: Commit changes
         run: |
